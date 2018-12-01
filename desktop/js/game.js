@@ -71,11 +71,11 @@ SnakeGame.Snake = function () {
         'u': 'd'
     };
     t_Snake.ss = [
-        ['r', 5],
-        ['d', 8],
-        ['l', 3],
-        ['d', 4],
-        ['r', 8]
+        ['r', 2], // start snake sizes
+        ['d', 2], // start snake sizes
+        ['l', 2], // start snake sizes
+        ['d', 2], // start snake sizes
+        ['r', 2] // start snake sizes
     ];
     t_Snake.points_factor = 10;
     t_Snake.points = 0;
@@ -84,12 +84,12 @@ SnakeGame.Snake = function () {
     });
 };
 
-SnakeGame.Snake.prototype.init = function () {
+SnakeGame.Snake.prototype.init = function (x, y) {
     this.snline = new PIXI.Graphics();
     this.game.app.stage.addChild(this.snline);
 
-    this.x = 50;
-    this.y = 50;
+    this.x = x || 50; // this is snake start coordinates
+    this.y = y || 50; // this is snake start coordinates
 };
 
 SnakeGame.Snake.prototype.rotate = function (rotation) {
@@ -322,6 +322,7 @@ SnakeGame.Snake.prototype.step = function (parameters) {
 
 var Game = function (parameters) {
     var t_Game = this;
+    console.log(t_Game)
 
     t_Game.parameters = parameters;
 
@@ -363,14 +364,6 @@ var Game = function (parameters) {
     t_Game.app.stage.addChild(bg_sprite);
     t_Game.app.stage.addChild(bgLayer);
 
-    var style = new PIXI.TextStyle({
-        fontFamily: 'Arial',
-        fontSize: 36,
-        fill: '#157518',
-        wordWrap: true,
-        wordWrapWidth: 200
-    });
-
     t_Game.newGame = function () {
         if (t_Game.game !== undefined) {
             t_Game.snake.snline.clear();
@@ -387,22 +380,19 @@ var Game = function (parameters) {
         t_Game.game.setSnake(t_Game.snake);
         t_Game.snake.init();
 
-        var time = 0;
-
         t_Game.ticker = new PIXI.ticker.Ticker();
 
-        var then = Date.now;
-        var now;
-
         t_Game.ticker.add(function (delta) {
-
             t_Game.game.placeMeals();
+
             t_Game.game.step({
                 delta: delta
             });
+
             t_Game.snake.step({
                 delta: delta
             });
+
             t_Game.snake.mealCollision({
                 delta: delta
             });
@@ -498,64 +488,8 @@ var Game = function (parameters) {
         t_Game.newGame();
         t_Game.play();
     })
-
-    var handler = function (event) {
-        if ([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
-            event.preventDefault();
-        }
-
-        if (event.keyCode == 37) { // LEFT
-            t_Game.snake.rotate('l');
-        } else if (event.keyCode == 39) { // RIGHT
-            t_Game.snake.rotate('r');
-        } else if (event.keyCode == 38) { // UP
-            t_Game.snake.rotate('u');
-        } else if (event.keyCode == 40) { // DOWN
-            t_Game.snake.rotate('d');
-        } else if (event.keyCode == 13) { // ENTER
-            if (!t_Game.playing) {
-                t_Game.newGame();
-                t_Game.play();
-            }
-        } else if (event.keyCode == 80) { // P
-            if (t_Game.playing) {
-                t_Game.pause();
-            } else {
-                t_Game.continue();
-            }
-        } else if (event.keyCode == 78) { // N
-            t_Game.stop();
-            t_Game.newGame();
-            t_Game.play();
-        }
-    };
-
-    window.addEventListener('keydown', handler);
-    if (parent && inIframe()) {
-        parent.window.addEventListener('keydown', handler);
-    }
-
-    t_Game.app.renderer.view.addEventListener('touchstart', function (event) {
-        if (t_Game.snake.d == 'l') {
-            t_Game.snake.rotate('u');
-        } else if (t_Game.snake.d == 'r') {
-            t_Game.snake.rotate('d');
-        } else if (t_Game.snake.d == 'd') {
-            t_Game.snake.rotate('l');
-        } else if (t_Game.snake.d == 'u') {
-            t_Game.snake.rotate('r');
-        }
-    }, false);
 };
 
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function inIframe() {
-    try {
-        return window.self !== window.top;
-    } catch (e) {
-        return true;
-    }
 }
