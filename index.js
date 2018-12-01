@@ -5,11 +5,19 @@ var path = require('path');
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
+var mobileDetect = require("mobile-detect");
 
 app.use(express.static(path.join(__dirname)));
 
 app.get("/", (req, res) => {
-    console.log(req.headers)
+    var md = new mobileDetect(req.headers['user-agent']);
+
+    console.log(md.mobile() !== null, md.mobile())
+    if (md.mobile() !== null) {
+        res.sendFile(path.join(__dirname, 'mobile') + "/index.html")
+        return
+    }
+
     res.sendFile(path.join(__dirname, 'public') + "/index.html")
 })
 
