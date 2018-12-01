@@ -132,16 +132,17 @@ io.on('connection', (socket) => {
     });
 
     socket.on("start_game", () => {
-        const id = getGameRoomId(socket);
+        const id = getMobileRoomId(socket);
         if (!id) {
             socket.emit("start_over", "no connected game found");
         }
 
         socket.to(id).emit("start_game");
+        socket.emit("start_game");
     });
 
     socket.on("game_over", (winner) => {
-        const id = getGameRoomId(socket);
+        const id = getMobileRoomId(socket);
         if (!id) {
             socket.emit("game_over", "no connected game found");
         }

@@ -10,11 +10,13 @@
 
 <body>
     <div id="app">
-        <div v-if="notConnected" class="page connect">
+
+        <div v-if="notConnected && !gameOver" class="page connect">
             <h3 class="title">Please, enter you id</h3>
             <input class="input" type="text" maxlength="7" v-model="groupId" @input="changeGroupId" />
         </div>
-        <div v-else class="page control">
+
+        <div v-if="!notConnected && !gameOver" class="page control">
             <div class="pause">
                 <div class="button" @click="pause"></div>
             </div>
@@ -30,6 +32,10 @@
                     <div class="button down arrow" @click="down"></div>
                 </div>
             </div>
+        </div>
+
+        <div v-if="gameOver" class="page over" @click="start">
+            <span>You lose</span>
         </div>
     </div>
 

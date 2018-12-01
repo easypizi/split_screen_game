@@ -5,6 +5,7 @@ new Vue({
         socketId: "",
         groupId: "",
         notConnected: true,
+        gameOver: false,
     },
     created() {
         this.socket = io.connect({
@@ -30,6 +31,14 @@ new Vue({
             }
 
             console.log(data)
+        });
+
+        this.socket.on("start_game", (data) => {
+            this.gameOver = false;
+        })
+
+        this.socket.on("game_over", (data) => {
+            this.gameOver = true;
         })
     },
     methods: {
@@ -59,6 +68,10 @@ new Vue({
         pause() {
             navigator.vibrate(500)
             this.socket.emit("pause")
+        },
+        start() {
+            navigator.vibrate(100)
+            this.socket.emit("start_game")
         }
     }
 })

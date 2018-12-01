@@ -419,6 +419,8 @@ var Game = function (parameters) {
         t_Game.events.finish({
             points: t_Game.snake.points
         });
+
+        socket.emit("game_over")
     };
 
     t_Game.stop = function () {
@@ -491,6 +493,11 @@ var Game = function (parameters) {
         t_Game.continue();
     })
 
+    socket.on("start_game", () => {
+        t_Game.stop();
+        t_Game.newGame();
+        t_Game.play();
+    })
 
     var handler = function (event) {
         if ([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
