@@ -4,7 +4,7 @@ new Vue({
         socket: null,
         socketId: "",
         groupId: "",
-        notConnected: false,
+        notConnected: true,
     },
     created() {
         this.socket = io.connect({
@@ -41,15 +41,19 @@ new Vue({
                 this.connect();
         },
         up() {
+            navigator.vibrate(50)
             this.socket.emit("up")
         },
         right() {
+            navigator.vibrate(50)
             this.socket.emit("right")
         },
         left() {
+            navigator.vibrate(50)
             this.socket.emit("left")
         },
         down() {
+            navigator.vibrate(50)
             this.socket.emit("down")
         }
     }

@@ -541,20 +541,3 @@ function inIframe() {
         return true;
     }
 }
-
-window.onload = () => {
-    var socket = io({
-        transports: ["websocket"],
-    })
-
-    socket.emit("create_room");
-    socket.emit("create_mobile");
-
-    socket.on("create_room", (data) => {
-        console.log(data)
-    });
-
-    socket.on("create_mobile", (data) => {
-        console.log(data)
-    });
-}
