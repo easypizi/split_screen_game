@@ -26,11 +26,12 @@ server.listen(port, () => {
     console.log('Server listening at port %d', port);
 });
 
-var numUsers = 0;
+io.set('transports', ['websocket']);
 
-io.listen(server);
+const deviceRooms = [];
 
 io.on('connection', (socket) => {
+    console.log("connected", socket.id)
     socket.emit("id", socket.id);
 
     socket.on("create_room", () => {
@@ -50,9 +51,11 @@ io.on('connection', (socket) => {
             return
         }
 
-        roomName = uid() + "_mobile";
+        roomName = uid();
 
-        socket.join(roomName);
+        socket.join(roomName + "_mobile");
+        deviceRooms.push(roomName + "_mobile");
+
         socket.emit("create_room", roomName);
     });
 
@@ -68,11 +71,13 @@ io.on('connection', (socket) => {
 
     socket.on("join_mobile", (roomName) => {
         if (Object.keys(socket.rooms).length > 2) {
-            socket.emit("join_room", "room limit esceded");
+            socket.emit("join_room", "room limit ecseded");
             return
         }
 
-        if (!roomName.endsWith("_mobile")) {
+        roomName += "_mobile";
+
+        if (deviceRooms.indexOf(roomName) === -1) {
             socket.emit("join_mobile", "wrong key");
             return
         }
@@ -82,7 +87,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on("up", () => {
-        const id = getGameRoomId(socket);
+        const id = getMobileRoomId(socket);
         if (!id) {
             socket.emit("up", "no connected desktop found");
         }
@@ -91,7 +96,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on("down", () => {
-        const id = getGameRoomId(socket);
+        const id = getMobileRoomId(socket);
         if (!id) {
             socket.emit("down", "no connected desktop found");
         }
@@ -100,7 +105,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on("right", () => {
-        const id = getGameRoomId(socket);
+        const id = getMobileRoomId(socket);
         if (!id) {
             socket.emit("right", "no connected desktop found");
         }
@@ -109,7 +114,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on("left", () => {
-        const id = getGameRoomId(socket);
+        const id = getMobileRoomId(socket);
         if (!id) {
             socket.emit("left", "no connected desktop found");
         }
@@ -134,10 +139,14 @@ io.on('connection', (socket) => {
 
         socket.to(id).emit("game_over", winner);
     });
+
+    socket.on("disconnected", () => {
+        console.log("disconnected")
+    })
 });
 
 const getMobileRoomId = (socket) => {
-    for (const room of socket) {
+    for (const room in socket.rooms) {
         if (room.endsWith("_mobile"))
             return room;
     }
@@ -146,7 +155,7 @@ const getMobileRoomId = (socket) => {
 }
 
 const getGameRoomId = (socket) => {
-    for (const room of socket) {
+    for (const room in socket.rooms) {
         if (!room.endsWith("_mobile"))
             return room;
     }
