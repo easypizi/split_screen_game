@@ -4,7 +4,7 @@ new Vue({
         socket: null,
         socketId: "",
         groupId: "",
-        notConnected: true,
+        notConnected: false,
     },
     created() {
         this.socket = io.connect({
