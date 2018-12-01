@@ -1,24 +1,25 @@
 // Setup basic express server
-var express = require('express');
-var app = express();
-var path = require('path');
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
-var port = process.env.PORT || 3000;
-var mobileDetect = require("mobile-detect");
+const express = require('express');
+const app = express();
+const path = require('path');
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const port = process.env.PORT || 3000;
+const mobileDetect = require("mobile-detect");
+
+const uid = require("uid");
 
 app.use(express.static(path.join(__dirname)));
 
 app.get("/", (req, res) => {
     var md = new mobileDetect(req.headers['user-agent']);
 
-    console.log(md.mobile() !== null, md.mobile())
     if (md.mobile() !== null) {
         res.sendFile(path.join(__dirname, 'mobile') + "/index.html")
         return
     }
 
-    res.sendFile(path.join(__dirname, 'public') + "/index.html")
+    res.sendFile(path.join(__dirname, 'desktop') + "/index.html")
 })
 
 server.listen(port, () => {
@@ -30,59 +31,125 @@ var numUsers = 0;
 io.listen(server);
 
 io.on('connection', (socket) => {
-    var addedUser = false;
+    socket.emit("id", socket.id);
 
-    // when the client emits 'new message', this listens and executes
-    socket.on('new message', (data) => {
-        // we tell the client to execute 'new message'
-        socket.broadcast.emit('new message', {
-            username: socket.username,
-            message: data
-        });
-    });
-
-    // when the client emits 'add user', this listens and executes
-    socket.on('add user', (username) => {
-        if (addedUser) return;
-
-        // we store the username in the socket session for this client
-        socket.username = username;
-        ++numUsers;
-        addedUser = true;
-        socket.emit('login', {
-            numUsers: numUsers
-        });
-        // echo globally (all clients) that a person has connected
-        socket.broadcast.emit('user joined', {
-            username: socket.username,
-            numUsers: numUsers
-        });
-    });
-
-    // when the client emits 'typing', we broadcast it to others
-    socket.on('typing', () => {
-        socket.broadcast.emit('typing', {
-            username: socket.username
-        });
-    });
-
-    // when the client emits 'stop typing', we broadcast it to others
-    socket.on('stop typing', () => {
-        socket.broadcast.emit('stop typing', {
-            username: socket.username
-        });
-    });
-
-    // when the user disconnects.. perform this
-    socket.on('disconnect', () => {
-        if (addedUser) {
-            --numUsers;
-
-            // echo globally that this client has left
-            socket.broadcast.emit('user left', {
-                username: socket.username,
-                numUsers: numUsers
-            });
+    socket.on("create_room", () => {
+        if (Object.keys(socket.rooms).length > 2) {
+            socket.emit("create_room", "room limit esceded");
+            return
         }
+
+        roomName = uid();
+        socket.join(roomName);
+        socket.emit("create_room", roomName);
+    });
+
+    socket.on("create_mobile", () => {
+        if (Object.keys(socket.rooms).length > 2) {
+            socket.emit("create_room", "room limit esceded");
+            return
+        }
+
+        roomName = uid() + "_mobile";
+
+        socket.join(roomName);
+        socket.emit("create_room", roomName);
+    });
+
+    socket.on("join_room", (roomName) => {
+        if (Object.keys(socket.rooms).length > 2) {
+            socket.emit("join_room", "room limit esceded");
+            return
+        }
+
+        socket.join(roomName);
+        socket.emit("join_room", "ok");
+    });
+
+    socket.on("join_mobile", (roomName) => {
+        if (Object.keys(socket.rooms).length > 2) {
+            socket.emit("join_room", "room limit esceded");
+            return
+        }
+
+        if (!roomName.endsWith("_mobile")) {
+            socket.emit("join_mobile", "wrong key");
+            return
+        }
+
+        socket.join(roomName);
+        socket.emit("join_mobile", "ok");
+    });
+
+    socket.on("up", () => {
+        const id = getGameRoomId(socket);
+        if (!id) {
+            socket.emit("up", "no connected desktop found");
+        }
+
+        socket.to(id).emit("up", socket.id);
+    });
+
+    socket.on("down", () => {
+        const id = getGameRoomId(socket);
+        if (!id) {
+            socket.emit("down", "no connected desktop found");
+        }
+
+        socket.to(id).emit("down", socket.id);
+    });
+
+    socket.on("right", () => {
+        const id = getGameRoomId(socket);
+        if (!id) {
+            socket.emit("right", "no connected desktop found");
+        }
+
+        socket.to(id).emit("right", socket.id);
+    });
+
+    socket.on("left", () => {
+        const id = getGameRoomId(socket);
+        if (!id) {
+            socket.emit("left", "no connected desktop found");
+        }
+
+        socket.to(id).emit("left", socket.id);
+    });
+
+    socket.on("start_game", () => {
+        const id = getGameRoomId(socket);
+        if (!id) {
+            socket.emit("start_over", "no connected game found");
+        }
+
+        socket.to(id).emit("start_game");
+    });
+
+    socket.on("game_over", (winner) => {
+        const id = getGameRoomId(socket);
+        if (!id) {
+            socket.emit("game_over", "no connected game found");
+        }
+
+        socket.to(id).emit("game_over", winner);
     });
 });
+
+const getMobileRoomId = (socket) => {
+    for (const room of socket) {
+        if (room.endsWith("_mobile"))
+            return room;
+    }
+
+    return "";
+}
+
+const getGameRoomId = (socket) => {
+    for (const room of socket) {
+        if (!room.endsWith("_mobile"))
+            return room;
+    }
+
+    return "";
+}

@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "4.16.4",
     "mobile-detect": "^1.4.3",
-    "socket.io": "2.2.0"
+    "socket.io": "2.2.0",
+    "uid": "0.0.2"
   }
 }
