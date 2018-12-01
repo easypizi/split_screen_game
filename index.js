@@ -122,6 +122,15 @@ io.on('connection', (socket) => {
         socket.to(id).emit("left", socket.id);
     });
 
+    socket.on("pause", () => {
+        const id = getMobileRoomId(socket);
+        if (!id) {
+            socket.emit("left", "no connected desktop found");
+        }
+
+        socket.to(id).emit("pause", socket.id);
+    });
+
     socket.on("start_game", () => {
         const id = getGameRoomId(socket);
         if (!id) {

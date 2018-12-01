@@ -445,6 +445,10 @@ var Game = function (parameters) {
         t_Game.events.begin();
     };
 
+    setTimeout(() => {
+        t_Game.pause();
+    }, 50)
+
     var socket = io({
         transports: ["websocket"],
     })
@@ -478,6 +482,13 @@ var Game = function (parameters) {
     socket.on("right", () => {
         console.log("right")
         t_Game.snake.rotate('r');
+    })
+
+    socket.on("pause", () => {
+        if (t_Game.playing)
+            return t_Game.pause();
+
+        t_Game.continue();
     })
 
 

@@ -15,6 +15,9 @@
             <input class="input" type="text" maxlength="7" v-model="groupId" @input="changeGroupId" />
         </div>
         <div v-else class="page control">
+            <div class="pause">
+                <div class="button" @click="pause"></div>
+            </div>
             <div class="buttons">
                 <div class="top">
                     <div class="button up arrow" @click="up"></div>

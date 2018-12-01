@@ -55,6 +55,10 @@ new Vue({
         down() {
             navigator.vibrate(50)
             this.socket.emit("down")
+        },
+        pause() {
+            navigator.vibrate(500)
+            this.socket.emit("pause")
         }
     }
 })

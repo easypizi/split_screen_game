@@ -22,13 +22,18 @@ input {
     background-color: #1d1d1d;
 }
 
-.connect {
+.connect,
+.control {
     display: flex;
     overflow: hidden;
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: center;
     justify-content: center;
     color: white;
+}
+
+.page.connect {
+    flex-direction: column;
 }
 
 .connect .title {
@@ -92,4 +97,16 @@ input {
 
 .up.arrow:after {
     transform: rotate(270deg);
+}
+
+.pause {
+    width: 50%;
+    display: flex;
+    align-items: start;
+    justify-content: left;
+    height: 100%;
+}
+
+.pause .button {
+    margin: 30px
 }
