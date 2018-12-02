@@ -100,7 +100,7 @@ input {
 }
 
 .up.arrow:after {
-    background-image: url("./up.png");
+    background-image: url("./btn.png");
 }
 
 .pause {
