@@ -15,10 +15,10 @@ var Game = function (parameters) {
     t_Game.parameters = parameters;
 
     t_Game.events = {};
-    t_Game.events.finish = function () {};
-    t_Game.events.begin = function () {};
-    t_Game.events.pause = function () {};
-    t_Game.events.continue = function () {};
+    t_Game.events.finish = function () { };
+    t_Game.events.begin = function () { };
+    t_Game.events.pause = function () { };
+    t_Game.events.continue = function () { };
 
     t_Game.playing = false;
 
@@ -46,7 +46,7 @@ var Game = function (parameters) {
     var bg_sprite = new PIXI.TilingSprite(bg_texture, t_Game.app.renderer.width, t_Game.app.renderer.height);
 
     var bgLayer = new PIXI.Graphics();
-    bgLayer.beginFill(0x000000, 0.75);
+    bgLayer.beginFill(0x000000, 0);
     bgLayer.drawRect(0, 0, t_Game.app.renderer.width, t_Game.app.renderer.height);
 
     t_Game.app.stage.addChild(bg_sprite);
