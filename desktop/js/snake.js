@@ -27,10 +27,10 @@ SnakeGame.Game.prototype.step = function (parameters) {
 
     t_Game.meals.forEach(function (m, mi) {
         m.meal.clear();
-        const sizeModificator = 10;
+        const sizeModificator = 2;
 
         m.meal.drawRect(m.x, m.y, t_Game.snake.length + sizeModificator, t_Game.snake.length + sizeModificator);
-        m.meal.drawRect(m.x, m.y, t_Game.snake1.length + sizeModificator, t_Game.snake1.length + sizeModificator);
+        // m.meal.drawRect(m.x, m.y, t_Game.snake1.length + sizeModificator, t_Game.snake1.length + sizeModificator);
     });
 };
 
@@ -39,7 +39,7 @@ SnakeGame.Game.prototype.placeMeals = function () {
         var meal = new PIXI.Graphics();
         this.app.stage.addChild(meal);
 
-        meal.beginFill(0x2060C6);
+        meal.beginFill(0xafce27);
 
         this.meals.push({
             x: randomInt(15, this.app.renderer.view.width) - 15,
@@ -69,6 +69,8 @@ Snake = function (toRight) {
         'd': 'u',
         'u': 'd'
     };
+
+    this.toRight = toRight;
 
     if (toRight) {
         t_Snake.ss = [
@@ -366,7 +368,12 @@ Snake.prototype.step = function (parameters) {
     t_Snake.snline.y = t_Snake.y;
 
     t_Snake.snline.moveTo(0, 0);
-    t_Snake.snline.lineStyle(t_Snake.length, 0x157518, 1);
+    if (this.toRight) {
+        t_Snake.snline.lineStyle(t_Snake.length, 0x5858b1, 1);
+    } else {
+        t_Snake.snline.lineStyle(t_Snake.length, 0x901414, 1);
+    }
+    // t_Snake.snline.lineStyle(t_Snake.length, 0x2060C6, 1);
 
     var rx = 0;
     var ry = 0;
