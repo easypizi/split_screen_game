@@ -36,6 +36,7 @@ io.on('connection', (socket) => {
 
     socket.on("create_room", () => {
         gameName = uid();
+        // gameName = "yltkm0o";
 
         socket.join(gameName);
         rooms[gameName] = [];
@@ -54,12 +55,12 @@ io.on('connection', (socket) => {
             return
         }
 
-        rooms[roomName].push = socket.id;
+        rooms[roomName].push(socket.id);
 
         socket.join(roomName);
 
         socket.to(roomName).emit("join_mobile", socket.id);
-        socket.emit("join_mobile", "ok");
+        socket.emit("join_mobile", rooms[roomName].length);
     });
 
     socket.on("up", (roomName) => {

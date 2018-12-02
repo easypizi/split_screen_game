@@ -17,6 +17,7 @@
         </div>
 
         <div v-if="!notConnected && !gameOver" class="page control">
+            <div v-bind:class="{ first: player === 1, second: player === 2}">Player {{player}}</div>
             <div class="pause">
                 <div class="button arrow" @click="pause"></div>
             </div>

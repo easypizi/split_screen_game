@@ -7,6 +7,7 @@ new Vue({
         notConnected: true,
         gameOver: false,
         loser: false,
+        player: 1,
     },
     created() {
         this.socket = io.connect({
@@ -26,12 +27,10 @@ new Vue({
         })
 
         this.socket.on("join_mobile", (data) => {
-            if (data === "ok") {
+            if (data === 1 || data === 2) {
                 this.notConnected = false;
-                return
+                this.player = data;
             }
-
-            console.log(data)
         });
 
         this.socket.on("start_game", (data) => {

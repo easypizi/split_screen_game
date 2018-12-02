@@ -202,7 +202,6 @@ Snake.prototype.snakeCollision = function (snake) {
     // let newX = this.x;
     // let newY = this.y;
 
-    console.log("===", snakeX, x, snakeY, y, this.weight(), snake.weight(), snake.length)
 
     if (diff_x < snake.length && diff_y < snake.length) {
         return true
@@ -228,7 +227,6 @@ Snake.prototype.snakeCollision = function (snake) {
         const length = snake.length * 2
 
         if ((s[0] == 'u') || (s[0] == 'd')) {
-            console.log("--- u/d", i, snakeX, x, snakeY, y, this.weight(), snake.weight(), s[1] * snake.length)
 
             if (s[0] == 'u') {
                 if (Math.abs(diff_x) < length / 2 && Math.abs(diff_y) < s[1] * length / 2 && diff_x > 0) {
@@ -248,7 +246,6 @@ Snake.prototype.snakeCollision = function (snake) {
                 }
             }
         } else if ((s[0] == 'l') || (s[0] == 'r')) {
-            console.log("--- l/r", i, snakeX, x, snakeY, y, this.weight(), snake.weight(), s[1] * snake.length)
 
             if (s[0] == 'l') {
                 if (Math.abs(diff_x) < s[1] * length / 2 && Math.abs(diff_y) < length / 2 && diff_x > 0) {
@@ -373,7 +370,6 @@ Snake.prototype.step = function (parameters) {
     } else {
         t_Snake.snline.lineStyle(t_Snake.length, 0x901414, 1);
     }
-    // t_Snake.snline.lineStyle(t_Snake.length, 0x2060C6, 1);
 
     var rx = 0;
     var ry = 0;
@@ -438,8 +434,5 @@ Snake.prototype.step = function (parameters) {
 
     decr(0, a);
 
-    if (t_Snake.ss[t_Snake.ss.length - 1] == undefined) {
-        console.log(1)
-    }
     t_Snake.ss[t_Snake.ss.length - 1][1] += a;
 };

@@ -130,3 +130,17 @@ input {
 .over span {
     font-size: 48px;
 }
+
+.first {
+    position: absolute;
+    top: 10px;
+    font-size: 24px;
+    color: #6858ab;
+}
+
+.second {
+    position: absolute;
+    top: 10px;
+    font-size: 24px;
+    color: #eb4147;
+}
