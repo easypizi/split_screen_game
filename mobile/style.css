@@ -96,11 +96,11 @@ input {
 }
 
 .left.arrow:after {
-    background-image: url("./up.png");
+    background-image: url("./btn.png");
 }
 
 .up.arrow:after {
-    background-image: url("./btn.png");
+    background-image: url("./up.png");
 }
 
 .pause {
