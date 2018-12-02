@@ -75,8 +75,8 @@ var Game = function (parameters) {
         t_Game.snake1 = snakes[1];
 
         t_Game.game.setSnake(t_Game.snake, t_Game.snake1);
-        t_Game.snake.init(t_Game.game);
-        t_Game.snake1.init(t_Game.game, 250, 250);
+        t_Game.snake.init(t_Game.game, 50, 300);
+        t_Game.snake1.init(t_Game.game, 700, 300);
 
         t_Game.ticker = new PIXI.ticker.Ticker();
 
@@ -109,6 +109,11 @@ var Game = function (parameters) {
 
             if (t_Game.snake1.selfCollision() || t_Game.snake1.borderCollision()) {
                 t_Game.finish(deviceIds[1]);
+            }
+
+            if (t_Game.snake.snakeCollision(t_Game.snake1) || t_Game.snake1.snakeCollision(t_Game.snake)) {
+                const loser = (t_Game.snake.weight() > t_Game.snake1.weight()) ? deviceIds[1] : deviceIds[0];
+                t_Game.finish(loser);
             }
         });
     };

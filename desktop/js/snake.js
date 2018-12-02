@@ -27,8 +27,10 @@ SnakeGame.Game.prototype.step = function (parameters) {
 
     t_Game.meals.forEach(function (m, mi) {
         m.meal.clear();
-        m.meal.drawRect(m.x, m.y, t_Game.snake.length, t_Game.snake.length);
-        m.meal.drawRect(m.x, m.y, t_Game.snake1.length, t_Game.snake1.length);
+        const sizeModificator = 10;
+
+        m.meal.drawRect(m.x, m.y, t_Game.snake.length + sizeModificator, t_Game.snake.length + sizeModificator);
+        m.meal.drawRect(m.x, m.y, t_Game.snake1.length + sizeModificator, t_Game.snake1.length + sizeModificator);
     });
 };
 
@@ -74,7 +76,7 @@ Snake = function (toRight) {
         ]
     } else {
         t_Snake.ss = [
-            ['l', 2]
+            ['l', 3]
         ]
     }
 
@@ -181,6 +183,87 @@ Snake.prototype.selfCollision = function () {
 
     return collision;
 };
+
+Snake.prototype.snakeCollision = function (snake) {
+    let x = this.x;
+    let y = this.y;
+
+    let snakeX = snake.x;
+    let snakeY = snake.y;
+
+    let diff_x = parseInt(Math.abs(snakeX - x));
+    let diff_y = parseInt(Math.abs(snakeY - y));
+
+    let collision = false;
+
+    console.log("===", snakeX, x, snakeY, y, this.weight(), snake.weight(), snake.length)
+
+    if (diff_x < snake.length && diff_y < snake.length) {
+        return true
+    }
+
+    this.ss.forEach((s, i) => {
+        if (collision)
+            return
+
+        if (s[0] == 'l') {
+            x += (this.length * s[1]) * -1;
+        } else if (s[0] == 'r') {
+            x += this.length * s[1];
+        } else if (s[0] == 'u') {
+            y += (this.length * s[1]) * -1;
+        } else if (s[0] == 'd') {
+            y += this.length * s[1];
+        }
+
+        diff_x = parseInt(snakeX - x);
+        diff_y = parseInt(snakeY - y);
+
+        const length = snake.length * 2
+
+        if ((s[0] == 'u') || (s[0] == 'd')) {
+            console.log("--- u/d", i, snakeX, x, snakeY, y, this.weight(), snake.weight(), s[1] * snake.length)
+
+            if (s[0] == 'u') {
+                if (Math.abs(diff_x) < length && diff_y < s[1] * length && diff_x > 0) {
+                    collision = true;
+                    return
+                }
+            } else {
+                if (Math.abs(diff_x) < length && diff_y < s[1] * length && diff_x < 0) {
+                    collision = true;
+                    return
+                }
+            }
+        } else if ((s[0] == 'l') || (s[0] == 'r')) {
+            console.log("--- l/r", i, snakeX, x, snakeY, y, this.weight(), snake.weight(), s[1] * snake.length)
+
+            if (s[0] == 'l') {
+                if (Math.abs(diff_x) < s[1] * length && diff_y < length && diff_x > 0) {
+                    collision = true;
+                    return
+                }
+            } else {
+                if (Math.abs(diff_x) < s[1] * length && diff_y < length && diff_x < 0) {
+                    collision = true;
+                    return
+                }
+            }
+        }
+    })
+
+    return collision
+}
+
+Snake.prototype.weight = function () {
+    let weight = 0;
+
+    this.ss.forEach((s, i) => {
+        weight += s[1];
+    })
+
+    return weight
+}
 
 Snake.prototype.borderCollision = function () {
     var t_Snake = this;
