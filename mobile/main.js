@@ -6,6 +6,7 @@ new Vue({
         groupId: "",
         notConnected: true,
         gameOver: false,
+        loser: false,
     },
     created() {
         this.socket = io.connect({
@@ -38,6 +39,7 @@ new Vue({
         })
 
         this.socket.on("game_over", (data) => {
+            this.loser = data.loser === this.socketId;
             this.gameOver = true;
         })
     },
@@ -51,31 +53,32 @@ new Vue({
         },
         up() {
             navigator.vibrate(50)
-            this.socket.emit("up")
+            this.socket.emit("up", this.groupId)
         },
         right() {
             navigator.vibrate(50)
-            this.socket.emit("right")
+            this.socket.emit("right", this.groupId)
         },
         left() {
             navigator.vibrate(50)
-            this.socket.emit("left")
+            this.socket.emit("left", this.groupId)
         },
         down() {
             navigator.vibrate(50)
-            this.socket.emit("down")
+            this.socket.emit("down", this.groupId)
         },
         pause() {
             navigator.vibrate(500)
-            this.socket.emit("pause")
+            this.socket.emit("pause", this.groupId)
         },
         start() {
             navigator.vibrate(100)
-            this.socket.emit("start_game")
+            this.socket.emit("start_game", this.groupId)
+        }
+    },
+    computed: {
+        gameOverText() {
+            return this.loser ? "lose" : "win"
         }
     }
 })
-
-const tmp = (socket) => {
-    socket.emit()
-}

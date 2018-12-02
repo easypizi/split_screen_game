@@ -50,7 +50,4 @@ $(document).ready(function (event) {
     $pause_continueButton.on('click', function (event) {
         game.continue();
     });
-
-    game.newGame();
-    game.play();
 });

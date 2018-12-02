@@ -28,147 +28,70 @@ server.listen(port, () => {
 
 io.set('transports', ['websocket']);
 
-const deviceRooms = [];
+const rooms = {};
 
 io.on('connection', (socket) => {
     console.log("connected", socket.id)
     socket.emit("id", socket.id);
 
     socket.on("create_room", () => {
-        if (Object.keys(socket.rooms).length > 2) {
-            socket.emit("create_room", "room limit esceded");
-            return
-        }
+        gameName = uid();
 
-        roomName = uid();
-        socket.join(roomName);
-        socket.emit("create_room", roomName);
-    });
+        socket.join(gameName);
+        rooms[gameName] = [];
 
-    socket.on("create_mobile", () => {
-        if (Object.keys(socket.rooms).length > 2) {
-            socket.emit("create_room", "room limit esceded");
-            return
-        }
-
-        roomName = uid();
-
-        socket.join(roomName + "_mobile");
-        deviceRooms.push(roomName + "_mobile");
-
-        socket.emit("create_room", roomName);
-    });
-
-    socket.on("join_room", (roomName) => {
-        if (Object.keys(socket.rooms).length > 2) {
-            socket.emit("join_room", "room limit esceded");
-            return
-        }
-
-        socket.join(roomName);
-        socket.emit("join_room", "ok");
+        socket.emit("create_room", gameName);
     });
 
     socket.on("join_mobile", (roomName) => {
-        if (Object.keys(socket.rooms).length > 2) {
-            socket.emit("join_room", "room limit ecseded");
+        if (!rooms[roomName]) {
+            socket.emit("join_mobile", "no room with that key");
             return
         }
 
-        roomName += "_mobile";
-
-        if (deviceRooms.indexOf(roomName) === -1) {
-            socket.emit("join_mobile", "wrong key");
+        if (rooms[roomName].length >= 2) {
+            socket.emit("join_mobile", "room full");
             return
         }
+
+        rooms[roomName].push = socket.id;
 
         socket.join(roomName);
+
+        socket.to(roomName).emit("join_mobile", socket.id);
         socket.emit("join_mobile", "ok");
     });
 
-    socket.on("up", () => {
-        const id = getMobileRoomId(socket);
-        if (!id) {
-            socket.emit("up", "no connected desktop found");
-        }
-
-        socket.to(id).emit("up", socket.id);
+    socket.on("up", (roomName) => {
+        socket.to(roomName).emit("up", socket.id);
     });
 
-    socket.on("down", () => {
-        const id = getMobileRoomId(socket);
-        if (!id) {
-            socket.emit("down", "no connected desktop found");
-        }
-
-        socket.to(id).emit("down", socket.id);
+    socket.on("down", (roomName) => {
+        socket.to(roomName).emit("down", socket.id);
     });
 
-    socket.on("right", () => {
-        const id = getMobileRoomId(socket);
-        if (!id) {
-            socket.emit("right", "no connected desktop found");
-        }
-
-        socket.to(id).emit("right", socket.id);
+    socket.on("right", (roomName) => {
+        socket.to(roomName).emit("right", socket.id);
     });
 
-    socket.on("left", () => {
-        const id = getMobileRoomId(socket);
-        if (!id) {
-            socket.emit("left", "no connected desktop found");
-        }
-
-        socket.to(id).emit("left", socket.id);
+    socket.on("left", (roomName) => {
+        socket.to(roomName).emit("left", socket.id);
     });
 
-    socket.on("pause", () => {
-        const id = getMobileRoomId(socket);
-        if (!id) {
-            socket.emit("left", "no connected desktop found");
-        }
-
-        socket.to(id).emit("pause", socket.id);
+    socket.on("pause", (roomName) => {
+        socket.to(roomName).emit("pause", socket.id);
     });
 
-    socket.on("start_game", () => {
-        const id = getMobileRoomId(socket);
-        if (!id) {
-            socket.emit("start_over", "no connected game found");
-        }
-
-        socket.to(id).emit("start_game");
-        socket.emit("start_game");
+    socket.on("start_game", (roomName) => {
+        socket.to(roomName).emit("start_game", socket.id);
+        socket.emit("start_game", socket.id);
     });
 
-    socket.on("game_over", (winner) => {
-        const id = getMobileRoomId(socket);
-        if (!id) {
-            socket.emit("game_over", "no connected game found");
-        }
-
-        socket.to(id).emit("game_over", winner);
+    socket.on("game_over", (data) => {
+        socket.to(data.room).emit("game_over", data);
     });
 
     socket.on("disconnected", () => {
         console.log("disconnected")
     })
 });
-
-const getMobileRoomId = (socket) => {
-    for (const room in socket.rooms) {
-        if (room.endsWith("_mobile"))
-            return room;
-    }
-
-    return "";
-}
-
-const getGameRoomId = (socket) => {
-    for (const room in socket.rooms) {
-        if (!room.endsWith("_mobile"))
-            return room;
-    }
-
-    return "";
-}
