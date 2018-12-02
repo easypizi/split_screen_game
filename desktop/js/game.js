@@ -169,7 +169,6 @@ var Game = function (parameters) {
     socket.on("create_room", (data) => {
         gameId = data;
         console.log(data);
-        alert(data)
     });
 
     socket.on("id", (data) => {
